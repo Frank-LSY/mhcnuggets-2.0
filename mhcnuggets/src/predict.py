@@ -11,6 +11,7 @@ import numpy as np
 from mhcnuggets.src.models import get_predictions, mhcnuggets_lstm
 from mhcnuggets.src.dataset import Dataset, mask_peptides, cut_pad_peptides
 from mhcnuggets.src.dataset import tensorize_keras, map_proba_to_ic50
+from mhcnuggets.src.dataset import map_ic50_for_regression, binarize_ic50
 from keras.optimizers import Adam
 import argparse
 from mhcnuggets.src.find_closest_mhcI import closest_allele as closest_mhcI
@@ -78,11 +79,15 @@ def predict(class_, peptides_path, mhc,
         filehandle = open(output, 'w')
     else:
         filehandle = sys.stdout
-
+    regression_ic50 = []
+    binarized_ic50 = []
     print(','.join(('peptide', 'ic50')), file=filehandle)
     for i, peptide in enumerate(peptides):
+        regression_ic50.append(map_ic50_for_regression(ic50s[i]))
+        binarized_ic50.append(binarize_ic50(ic50s[i]))
         print(','.join((peptide, str(ic50s[i]))), file=filehandle)
-
+    print (regression_ic50)
+    print (binarized_ic50)
 
 def parse_args():
     '''
